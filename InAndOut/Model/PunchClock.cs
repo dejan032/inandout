@@ -29,6 +29,22 @@ namespace InAndOut.Model
             OnBreak,
             Unknown
         }
+
+        public void Toggle()
+        {
+            if (State == PunchClockStates.PunchedIn)
+                State = PunchClockStates.PunchedOut;
+            else if (State == PunchClockStates.PunchedOut)
+                State = PunchClockStates.PunchedIn;
+        }
+
+        internal void ToggleBreak()
+        {
+            if (State == PunchClockStates.PunchedIn)
+                State = PunchClockStates.OnBreak;
+            else if (State == PunchClockStates.OnBreak)
+                State = PunchClockStates.PunchedIn;
+        }
     }
    
   

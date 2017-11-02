@@ -22,6 +22,7 @@ namespace InAndOut.ViewModel
         /// </summary>
         public MainViewModel()
         {
+            punchClock = PunchClock.Instance;
             PunchClockButtonCommand = new RelayCommand(new Action(ExecutePunchClockButtonCommand));
             BreakClockButtonCommand = new RelayCommand(new Action(ExecuteBreakClockButtonCommand));
         }
@@ -30,16 +31,16 @@ namespace InAndOut.ViewModel
         {
             if (BreakSecondsCount == 0)
                 BreakTimePassedText = DEFAULT_ZERO_TIME_TEXT;
-            else
-            {
-                BreakButtonText = "Break";
-                BreakButtonIsEnabled = false;
-            }
-                
-            
-            BreakTimerVisibility = Visibility.Visible;
-            BreakButtonText = "Stop Break";
 
+            BreakTimerVisibility = Visibility.Visible;
+            punchClock.ToggleBreak();
+            
+            BreakButtonText = punchClock.State == PunchClock.PunchClockStates.OnBreak ? "Stop Break" : "Break";
+            ToggleBreakTimer();
+        }
+
+        private void ToggleBreakTimer()
+        {
             if (WorkTimer != null)
             {
                 if (WorkTimer.IsEnabled)
@@ -50,18 +51,34 @@ namespace InAndOut.ViewModel
 
             if (BreakTimer == null)
             {
-                BreakTimer = new DispatcherTimer();
-                BreakTimer.Interval = TimeSpan.FromSeconds(1);
-                BreakTimer.Tick += BreakTimer_Tick;
-                BreakTimer.Start();
-            }
+                StartBreakTimer();            }
             else
             {
-                BreakTimer.Tick -= BreakTimer_Tick;
-                BreakTimer.Stop();
-                BreakTimer = null;
+                StopBreakTimer();
             }
-            
+
+        }
+
+        private void StopBreakTimer()
+        {
+            if (BreakTimer == null) return;
+            BreakTimer = new DispatcherTimer()
+            {
+                Interval = TimeSpan.FromSeconds(1)
+            };
+            BreakTimer.Tick += BreakTimer_Tick;
+            BreakTimer.Start();
+        }
+
+        private void StartBreakTimer()
+        {
+            if (BreakTimer != null) return;
+            BreakTimer = new DispatcherTimer()
+            {
+                Interval = TimeSpan.FromSeconds(1)
+            };
+            BreakTimer.Tick += BreakTimer_Tick;
+            BreakTimer.Start();
         }
 
         private void BreakTimer_Tick(object sender, EventArgs e)
@@ -72,23 +89,38 @@ namespace InAndOut.ViewModel
 
         private void ExecutePunchClockButtonCommand()
         {
-            if(WorkingSecondsCount == 0)
+            if (WorkingSecondsCount == 0)
             {
                 WorkTimePassedText = DEFAULT_ZERO_TIME_TEXT;
-                if (punchClock.State != PunchClock.PunchClockStates.PunchedIn)
-                    punchClock.State = PunchClock.PunchClockStates.PunchedIn;
+                punchClock.State = PunchClock.PunchClockStates.PunchedOut;
             }
 
-            if(punchClock.State == PunchClock.PunchClockStates.PunchedIn)
-                PunchClockButtonText = "Punch Out";
-            else
-            if(BreakSecondsCount == 0)
-            BreakButtonIsEnabled = true;
+            punchClock.Toggle();
+            Boolean punchedIn = punchClock.State == PunchClock.PunchClockStates.PunchedIn;
+            PunchClockButtonText = punchedIn ? "Punch Out" : "Punch In";
+            BreakButtonIsEnabled = punchedIn;
+            SetBreakEnabled(punchedIn);
+            ToggleWorkTimer();
+        }
 
+        private void SetBreakEnabled(Boolean value)
+        {
+            BreakButtonText = value ? "Start Break" : "Stop break";
+            BreakButtonIsEnabled = value;
+            if (value)
+                StartBreakTimer();
+            else
+                StopBreakTimer();
+        }
+
+        private void ToggleWorkTimer()
+        {
             if (WorkTimer == null)
             {
-                WorkTimer = new DispatcherTimer();
-                WorkTimer.Interval = TimeSpan.FromSeconds(1);
+                WorkTimer = new DispatcherTimer()
+                {
+                    Interval = TimeSpan.FromSeconds(1)
+                };
                 WorkTimer.Tick += WorkTimer_Tick;
                 WorkTimer.Start();
             }
@@ -98,7 +130,6 @@ namespace InAndOut.ViewModel
                 WorkTimer.Stop();
                 WorkTimer = null;
             }
-            
         }
 
         private void WorkTimer_Tick(object sender, EventArgs e)

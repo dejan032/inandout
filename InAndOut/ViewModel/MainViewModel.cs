@@ -7,6 +7,7 @@ using System.Windows.Threading;
 
 namespace InAndOut.ViewModel
 {
+    /// <inheritdoc />
     /// <summary>
     /// This class contains properties that the main View can data bind to.
     /// <para>
@@ -15,171 +16,166 @@ namespace InAndOut.ViewModel
     /// </summary>
     public class MainViewModel : ViewModelBase
     {
-        PunchClock punchClock;
+        private readonly PunchClock _punchClock;
 
+        /// <inheritdoc />
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
         public MainViewModel()
         {
-            punchClock = PunchClock.Instance;
-            PunchClockButtonCommand = new RelayCommand(new Action(ExecutePunchClockButtonCommand));
-            BreakClockButtonCommand = new RelayCommand(new Action(ExecuteBreakClockButtonCommand));
+            _punchClock = PunchClock.Instance;
         }
 
         private void ExecuteBreakClockButtonCommand()
         {
-            if (BreakSecondsCount == 0)
-                BreakTimePassedText = DEFAULT_ZERO_TIME_TEXT;
+            if (_breakSecondsCount == 0)
+                BreakTimerPassedText = DefaultZeroTimeText;
 
             BreakTimerVisibility = Visibility.Visible;
-            punchClock.ToggleBreak();
-            
-            BreakButtonText = punchClock.State == PunchClock.PunchClockStates.OnBreak ? "Stop Break" : "Break";
+            _punchClock.ToggleBreak();
+
+            UpdateBreakButtonText(_punchClock.State);
             ToggleBreakTimer();
+        }
+
+        private void UpdateBreakButtonText(PunchClock.PunchClockStates state)
+        {
+            switch (state)
+            {
+                case PunchClock.PunchClockStates.OnBreak:
+                    BreakButtonText = "Stop Break";
+                    break;
+                case PunchClock.PunchClockStates.PunchedIn:
+                case PunchClock.PunchClockStates.PunchedOut:
+                case PunchClock.PunchClockStates.Unknown:
+                default:
+                    BreakButtonText = "Start Break";
+                    break;
+            }
         }
 
         private void ToggleBreakTimer()
         {
-            if (WorkTimer != null)
+            if (_workTimer != null)
             {
-                if (WorkTimer.IsEnabled)
-                    WorkTimer.Stop();
+                if (_workTimer.IsEnabled)
+                    _workTimer.Stop();
                 else
-                    WorkTimer.Start();
+                    _workTimer.Start();
             }
 
-            if (BreakTimer == null)
+            if (_breakTimer == null)
             {
-                StartBreakTimer();            }
+                StartBreakTimer();
+            }
             else
             {
                 StopBreakTimer();
             }
-
         }
 
         private void StopBreakTimer()
         {
-            if (BreakTimer == null) return;
-            BreakTimer = new DispatcherTimer()
-            {
-                Interval = TimeSpan.FromSeconds(1)
-            };
-            BreakTimer.Tick += BreakTimer_Tick;
-            BreakTimer.Start();
+            if (_breakTimer == null) return;
+
+            _breakTimer.Stop();
+            _breakTimer.Tick -= BreakTimer_Tick;
+            _breakTimer = null;
         }
 
         private void StartBreakTimer()
         {
-            if (BreakTimer != null) return;
-            BreakTimer = new DispatcherTimer()
+            if (_breakTimer != null) return;
+            _breakTimer = new DispatcherTimer()
             {
                 Interval = TimeSpan.FromSeconds(1)
             };
-            BreakTimer.Tick += BreakTimer_Tick;
-            BreakTimer.Start();
+            _breakTimer.Tick += BreakTimer_Tick;
+            _breakTimer.Start();
         }
 
         private void BreakTimer_Tick(object sender, EventArgs e)
         {
-            BreakSecondsCount++;
-            BreakTimePassedText = TimeSpan.FromSeconds(BreakSecondsCount).ToString();
+            _breakSecondsCount++;
+            BreakTimerPassedText = TimeSpan.FromSeconds(_breakSecondsCount).ToString();
         }
 
         private void ExecutePunchClockButtonCommand()
         {
-            if (WorkingSecondsCount == 0)
+            if (_workingSecondsCount == 0)
             {
-                WorkTimePassedText = DEFAULT_ZERO_TIME_TEXT;
-                punchClock.State = PunchClock.PunchClockStates.PunchedOut;
+                WorkTimerPassedText = DefaultZeroTimeText;
+                _punchClock.State = PunchClock.PunchClockStates.PunchedOut;
             }
 
-            punchClock.Toggle();
-            Boolean punchedIn = punchClock.State == PunchClock.PunchClockStates.PunchedIn;
+            _punchClock.Toggle();
+            var punchedIn = _punchClock.State == PunchClock.PunchClockStates.PunchedIn;
             PunchClockButtonText = punchedIn ? "Punch Out" : "Punch In";
-            BreakButtonIsEnabled = punchedIn;
             SetBreakEnabled(punchedIn);
             ToggleWorkTimer();
         }
 
-        private void SetBreakEnabled(Boolean value)
+        private void SetBreakEnabled(bool value)
         {
-            BreakButtonText = value ? "Start Break" : "Stop break";
+            UpdateBreakButtonText(_punchClock.State);
             BreakButtonIsEnabled = value;
-            if (value)
-                StartBreakTimer();
-            else
-                StopBreakTimer();
         }
 
         private void ToggleWorkTimer()
         {
-            if (WorkTimer == null)
+            if (_workTimer == null)
             {
-                WorkTimer = new DispatcherTimer()
+                _workTimer = new DispatcherTimer()
                 {
                     Interval = TimeSpan.FromSeconds(1)
                 };
-                WorkTimer.Tick += WorkTimer_Tick;
-                WorkTimer.Start();
+                _workTimer.Tick += WorkTimer_Tick;
+                _workTimer.Start();
             }
             else
             {
-                WorkTimer.Tick -= WorkTimer_Tick;
-                WorkTimer.Stop();
-                WorkTimer = null;
+                _workTimer.Tick -= WorkTimer_Tick;
+                _workTimer.Stop();
+                _workTimer = null;
+                StopBreakTimer();
             }
         }
 
         private void WorkTimer_Tick(object sender, EventArgs e)
         {
-            WorkingSecondsCount++;
-            WorkTimePassedText = TimeSpan.FromSeconds(WorkingSecondsCount).ToString();
-            
+            _workingSecondsCount++;
+            WorkTimerPassedText = TimeSpan.FromSeconds(_workingSecondsCount).ToString();
         }
 
-        private int WorkingSecondsCount = 0;
-        private int BreakSecondsCount = 0;
-        private const string DEFAULT_ZERO_TIME_TEXT = "00:00:00";
+        private int _workingSecondsCount;
+        private int _breakSecondsCount;
+        private const string DefaultZeroTimeText = "00:00:00";
         
-        private DispatcherTimer WorkTimer;
-        private DispatcherTimer BreakTimer;
+        private DispatcherTimer _workTimer;
+        private DispatcherTimer _breakTimer;
 
-        /// <summary>
-        /// The <see cref="WorkTimePassedText" /> property's name.
-        /// </summary>
-        public const string WorkTimePassedTextPropertyName = "WorkTimePassedText";
-
-        private String _workTimePassedText = DEFAULT_ZERO_TIME_TEXT;
+        private string _workTimerPassedText = DefaultZeroTimeText;
 
         /// <summary>
         /// Gets the WorkTimePassedText property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public String WorkTimePassedText
+        public string WorkTimerPassedText
         {
-            get
-            {
-                return _workTimePassedText;
-            }
+            get => _workTimerPassedText;
 
             set
             {
-                if (_workTimePassedText == value)
+                if (_workTimerPassedText == value)
                 {
                     return;
                 }
 
-                _workTimePassedText = value;
-                RaisePropertyChanged(WorkTimePassedTextPropertyName);
+                _workTimerPassedText = value;
+                RaisePropertyChanged(nameof(WorkTimerPassedText));
             }
         }
-
-        /// <summary>
-        /// The <see cref="WorkTimerVisibility" /> property's name.
-        /// </summary>
-        public const string WorkTimerVisibilityPropertyName = "WorkTimerVisibility";
 
         private Visibility _workTimerVisibility = Visibility.Visible;
 
@@ -189,10 +185,7 @@ namespace InAndOut.ViewModel
         /// </summary>
         public Visibility WorkTimerVisibility
         {
-            get
-            {
-                return _workTimerVisibility;
-            }
+            get => _workTimerVisibility;
 
             set
             {
@@ -202,44 +195,31 @@ namespace InAndOut.ViewModel
                 }
 
                 _workTimerVisibility = value;
-                RaisePropertyChanged(WorkTimerVisibilityPropertyName);
+                RaisePropertyChanged(nameof(WorkTimerVisibility));
             }
         }
 
-        /// <summary>
-        /// The <see cref="BreakTimePassedText" /> property's name.
-        /// </summary>
-        public const string BreakTimePassedTextPropertyName = "BreakTimePassedText";
-
-        private String _breakTimePassedText = DEFAULT_ZERO_TIME_TEXT;
+        private string _breakTimerPassedText = DefaultZeroTimeText;
 
         /// <summary>
-        /// Gets the BreakTimePassedText property.
+        /// Gets the BreakTimerPassedText property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public String BreakTimePassedText
+        public string BreakTimerPassedText
         {
-            get
-            {
-                return _breakTimePassedText;
-            }
+            get => _breakTimerPassedText;
 
             set
             {
-                if (_breakTimePassedText == value)
+                if (_breakTimerPassedText == value)
                 {
                     return;
                 }
 
-                _breakTimePassedText = value;
-                RaisePropertyChanged(BreakTimePassedTextPropertyName);
+                _breakTimerPassedText = value;
+                RaisePropertyChanged(nameof(BreakTimerPassedText));
             }
         }
-
-        /// <summary>
-        /// The <see cref="BreakTimerVisibility" /> property's name.
-        /// </summary>
-        public const string BreakTimerVisibilityPropertyName = "BreakTimerVisibility";
 
         private Visibility _breakTimerVisibility = Visibility.Collapsed;
 
@@ -249,10 +229,7 @@ namespace InAndOut.ViewModel
         /// </summary>
         public Visibility BreakTimerVisibility
         {
-            get
-            {
-                return _breakTimerVisibility;
-            }
+            get => _breakTimerVisibility;
 
             set
             {
@@ -262,27 +239,19 @@ namespace InAndOut.ViewModel
                 }
 
                 _breakTimerVisibility = value;
-                RaisePropertyChanged(BreakTimerVisibilityPropertyName);
+                RaisePropertyChanged(nameof(BreakTimerVisibility));
             }
         }
 
-        /// <summary>
-        /// The <see cref="PunchClockButtonText" /> property's name.
-        /// </summary>
-        public const string PunchClockButtonTextPropertyName = "PunchClockButtonText";
-
-        private String _punchClockButtonText = "Punch In";
+        private string _punchClockButtonText = "Punch In";
 
         /// <summary>
         /// Gets the PunchClockButtonText property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public String PunchClockButtonText
+        public string PunchClockButtonText
         {
-            get
-            {
-                return _punchClockButtonText;
-            }
+            get => _punchClockButtonText;
 
             set
             {
@@ -292,48 +261,14 @@ namespace InAndOut.ViewModel
                 }
 
                 _punchClockButtonText = value;
-                RaisePropertyChanged(PunchClockButtonTextPropertyName);
-            }
-        }
-        
-        /// <summary>
-        /// The <see cref="PunchClockButtonCommand" /> property's name.
-        /// </summary>
-        public const string PunchClockButtonCommandPropertyName = "PunchClockButtonCommand";
-
-        private RelayCommand _punchClockButtonCommand;
-
-        /// <summary>
-        /// Gets the PunchClockButtonCommand property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public RelayCommand PunchClockButtonCommand
-        {
-            get
-            {
-                return _punchClockButtonCommand;
-            }
-
-            set
-            {
-                if (_punchClockButtonCommand == value)
-                {
-                    return;
-                }
-
-                _punchClockButtonCommand = value;
-                RaisePropertyChanged(PunchClockButtonCommandPropertyName);
+                RaisePropertyChanged(nameof(PunchClockButtonText));
             }
         }
 
-        
+        public RelayCommand PunchClockButtonCommand => new RelayCommand(ExecutePunchClockButtonCommand);
 
-        /// <summary>
-        /// The <see cref="BreakButtonIsEnabled" /> property's name.
-        /// </summary>
-        public const string BreakButtonIsEnabledPropertyName = "BreakButtonIsEnabled";
 
-        private bool _breakButtonIsEnabled = false;
+        private bool _breakButtonIsEnabled;
 
         /// <summary>
         /// Gets the BreakButtonIsEnabled property.
@@ -341,10 +276,7 @@ namespace InAndOut.ViewModel
         /// </summary>
         public bool BreakButtonIsEnabled
         {
-            get
-            {
-                return _breakButtonIsEnabled;
-            }
+            get => _breakButtonIsEnabled;
 
             set
             {
@@ -354,28 +286,19 @@ namespace InAndOut.ViewModel
                 }
 
                 _breakButtonIsEnabled = value;
-                RaisePropertyChanged(BreakButtonIsEnabledPropertyName);
+                RaisePropertyChanged(nameof(BreakButtonIsEnabled));
             }
         }
 
-
-        /// <summary>
-        /// The <see cref="BreakButtonText" /> property's name.
-        /// </summary>
-        public const string BreakButtonTextPropertyName = "BreakButtonText";
-
-        private String _breakButtonText = "Start Break";
+        private string _breakButtonText = "Start Break";
 
         /// <summary>
         /// Gets the BreakButtonText property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public String BreakButtonText
+        public string BreakButtonText
         {
-            get
-            {
-                return _breakButtonText;
-            }
+            get => _breakButtonText;
 
             set
             {
@@ -385,50 +308,10 @@ namespace InAndOut.ViewModel
                 }
 
                 _breakButtonText = value;
-                RaisePropertyChanged(BreakButtonTextPropertyName);
+                RaisePropertyChanged(nameof(BreakButtonText));
             }
         }
 
-        /// <summary>
-        /// The <see cref="BreakClockButtonCommand" /> property's name.
-        /// </summary>
-        public const string BreakClockButtonCommandPropertyName = "BreakClockButtonCommand";
-
-        private RelayCommand _breakClockButtonCommand;
-
-        /// <summary>
-        /// Gets the BreakClockButtonCommand property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public RelayCommand BreakClockButtonCommand
-        {
-            get
-            {
-                return _breakClockButtonCommand;
-            }
-
-            set
-            {
-                if (_breakClockButtonCommand == value)
-                {
-                    return;
-                }
-
-                _breakClockButtonCommand = value;
-                RaisePropertyChanged(BreakClockButtonCommandPropertyName);
-            }
-        }
-        
-        ////public override void Cleanup()
-        ////{
-        ////    // Clean up if needed
-
-        ////    base.Cleanup();
-        ////}
-
-
-
+        public RelayCommand BreakClockButtonCommand => new RelayCommand(ExecuteBreakClockButtonCommand);
     }
-
-   
 }

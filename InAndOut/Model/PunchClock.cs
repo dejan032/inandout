@@ -1,24 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InAndOut.Model
 {
-
     public class PunchClock
     {
         private PunchClock() { }
         static PunchClock() { }
 
-        private static PunchClock _instance = new PunchClock();
-        public static PunchClock Instance { get { return _instance; } }
+        public static PunchClock Instance { get; } = new PunchClock();
 
-        public void PunchIn() { return; }
-        public void PunchOut() { return; }
-        public void BreakStart() { return; }
-        public void BreakEnd() { return; }
+        public void PunchIn() {
+        }
+        public void PunchOut() {
+        }
+        public void BreakStart() {
+        }
+        public void BreakEnd() {
+        }
 
         public PunchClockStates State { get; set; }
 
@@ -32,20 +30,38 @@ namespace InAndOut.Model
 
         public void Toggle()
         {
-            if (State == PunchClockStates.PunchedIn)
-                State = PunchClockStates.PunchedOut;
-            else if (State == PunchClockStates.PunchedOut)
-                State = PunchClockStates.PunchedIn;
+            switch (State)
+            {
+                case PunchClockStates.PunchedIn:
+                case PunchClockStates.OnBreak:
+                    State = PunchClockStates.PunchedOut;
+                    break;
+                case PunchClockStates.PunchedOut:
+                    State = PunchClockStates.PunchedIn;
+                    break;
+                case PunchClockStates.Unknown:
+                default:
+                    break;
+            }
         }
 
         internal void ToggleBreak()
         {
-            if (State == PunchClockStates.PunchedIn)
-                State = PunchClockStates.OnBreak;
-            else if (State == PunchClockStates.OnBreak)
-                State = PunchClockStates.PunchedIn;
+            switch (State)
+            {
+                case PunchClockStates.PunchedIn:
+                    State = PunchClockStates.OnBreak;
+                    break;
+                case PunchClockStates.OnBreak:
+                    State = PunchClockStates.PunchedIn;
+                    break;
+                case PunchClockStates.PunchedOut:
+                case PunchClockStates.Unknown:
+                default:
+                    break;
+            }
         }
     }
-   
-  
+
+
 }

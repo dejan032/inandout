@@ -1,0 +1,11 @@
+﻿<UserControl x:Class="InAndOut.View.Menu.MainMenu"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:InAndOut.View.Menu"
+             >
+    
+    <StackPanel >
+        <Button Content="Settings" Margin="10"/>
+        <Button Content="Stats" Margin="10"/>
+    </StackPanel>
+</UserControl>

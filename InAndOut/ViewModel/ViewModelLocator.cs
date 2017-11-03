@@ -27,6 +27,7 @@ namespace InAndOut.ViewModel
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
 
             SimpleIoc.Default.Register<MainViewModel>();
+            SimpleIoc.Default.Register<PunchClockViewModel>();
         }
 
         /// <summary>
@@ -36,6 +37,8 @@ namespace InAndOut.ViewModel
             "CA1822:MarkMembersAsStatic",
             Justification = "This non-static member is needed for data binding purposes.")]
         public MainViewModel Main => ServiceLocator.Current.GetInstance<MainViewModel>();
+
+        public PunchClockViewModel PunchClock => ServiceLocator.Current.GetInstance<PunchClockViewModel>();
 
         /// <summary>
         /// Cleans up all the resources.

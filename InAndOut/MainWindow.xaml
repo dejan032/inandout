@@ -2,6 +2,8 @@
                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                      xmlns:mahApps="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                     xmlns:iconPacks="using:MahApps.Metro.IconPacks"
+                     xmlns:iconPacks1="http://metro.mahapps.com/winfx/xaml/iconpacks"
                      Title="InAndOut"
                      SizeToContent="WidthAndHeight"
                      ResizeMode="NoResize"
@@ -21,51 +23,18 @@
 
     <mahApps:MetroWindow.Flyouts>
         <mahApps:FlyoutsControl>
-            <mahApps:Flyout x:Name="sideBar"/>
+            <mahApps:Flyout x:Name="sideBar" Content="{Binding Menu}" AnimateOpacity="True"
+                            AutoCloseInterval="15000" IsAutoCloseEnabled="True" CloseButtonVisibility="Collapsed" />
         </mahApps:FlyoutsControl>
     </mahApps:MetroWindow.Flyouts>
     
     <mahApps:MetroWindow.LeftWindowCommands>
         <mahApps:WindowCommands>
-            <ToggleButton Width="50"
-                          Height="50"
-                          Margin="0, 10, 0, 0"
+            <ToggleButton Width="30" Height="30"
                           IsChecked="{Binding ElementName=sideBar, Path=IsOpen}"
-                          Style="{DynamicResource MetroCircleToggleButtonStyle}">
-                <Rectangle Width="20"
-                           Height="20"
-                           Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ToggleButton}}}">
-                    <Rectangle.OpacityMask>
-                        <VisualBrush Stretch="Fill"
-                                     Visual="{DynamicResource appbar_city}"/>
-                    </Rectangle.OpacityMask>
-                </Rectangle>
-            </ToggleButton>
+                          Content="{iconPacks1:PackIconMaterial  Menu}"/>
         </mahApps:WindowCommands>
     </mahApps:MetroWindow.LeftWindowCommands>
-    
-    <Grid x:Name="LayoutRoot" >
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <Label Content="Working:" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" Margin="25" VerticalAlignment="Center"
-               FontFamily="Sergio UI" FontSize="20" FontWeight="Medium" Visibility="{Binding WorkTimerVisibility,FallbackValue=Visible}"/>
-        <TextBlock Text="{Binding WorkTimerPassedText,FallbackValue=0:00:00}" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center"
-                   Margin="25" VerticalAlignment="Center" FontFamily="Sergio UI" FontSize="20" FontWeight="Bold" Visibility="{Binding WorkTimerVisibility,FallbackValue=Visible}"/>
-        <Label Content="Break:" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" Margin="25" VerticalAlignment="Center" FontFamily="Sergio UI" FontSize="20" FontWeight="Medium"
-               Visibility="{Binding BreakTimerVisibility,FallbackValue=Collapsed}"/>
-        <TextBlock Text="{Binding BreakTimerPassedText,FallbackValue=0:00:00}" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" 
-                   Margin="25" VerticalAlignment="Center" FontFamily="Sergio UI" FontSize="20" FontWeight="Bold" Visibility="{Binding BreakTimerVisibility,FallbackValue=Collapsed}"/>
-        <Button Content="{Binding PunchClockButtonText, FallbackValue='Punch In'}" Grid.Column="0" Grid.Row="2" Style="{DynamicResource SquareButtonStyle}" 
-                Height="50" Width="80" Margin="10" Command="{Binding PunchClockButtonCommand}"/>
-        <Button Content="{Binding BreakButtonText, FallbackValue='Start Break'}" Grid.Column="1" Grid.Row="2" Style="{DynamicResource SquareButtonStyle}"
-                Height="50" Width="80" Margin="10" Command="{Binding BreakClockButtonCommand}" IsEnabled="{Binding BreakButtonIsEnabled,FallbackValue=False}"/>
-    </Grid>
+    <ContentControl Name="ContentHolder" Content="{Binding Content}" PreviewMouseDown="ContentHolder_OnPreviewMouseDown" />
 </mahApps:MetroWindow>
 

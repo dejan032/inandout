@@ -2,9 +2,12 @@
 using GalaSoft.MvvmLight.CommandWpf;
 using InAndOut.Model;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using GalaSoft.MvvmLight.Messaging;
+using MenuItem = InAndOut.Model.MenuItem;
 
 namespace InAndOut.ViewModel
 {
@@ -26,6 +29,24 @@ namespace InAndOut.ViewModel
         public PunchClockViewModel()
         {
             _punchClock = PunchClock.Instance;
+            InitMenuItems();
+            Messenger.Default.Send(new PropertyChangedMessage<List<Model.MenuItem>>(default(List<MenuItem>), _menuItems, MainViewModel.MenuItemsPropertyName));
+        }
+
+        private void InitMenuItems()
+        {
+            var menu = new List<Model.MenuItem>
+            {
+                new Model.MenuItem()
+                {
+                    Name = "Details",
+                    CallBackAction = new RelayCommand(() =>
+                    {
+                        Messenger.Default.Send(new PropertyChangedMessage<string>(default(string), "details",MainViewModel.ContentPropertyName));
+                    })
+                }
+            };
+            _menuItems = menu;
         }
 
         private void ExecuteBreakClockButtonCommand()
@@ -309,6 +330,7 @@ namespace InAndOut.ViewModel
         }
 
         private string _breakButtonText = "Start Break";
+        private List<MenuItem> _menuItems;
 
         /// <summary>
         /// Gets the BreakButtonText property.

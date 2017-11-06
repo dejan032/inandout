@@ -28,16 +28,6 @@ namespace InAndOut
             {
                 sideBar.IsOpen = false;
             }
-
-            using (var db = new LiteDatabase(@"MyData.db"))
-            {
-                // Get a collection (or create, if doesn't exist)
-                var col = db.GetCollection<TimeEntry>("break-entries");
-                var timeEntries = col.FindAll();
-
-                var col2 = db.GetCollection<TimeEntry>("work-entries");
-                var findAll = col2.FindAll();
-            }
         }
     }
 }

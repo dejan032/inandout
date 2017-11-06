@@ -12,5 +12,6 @@ namespace InAndOut.Model
         public DateTime TimeStamp { get; set; }
         public DateTime InTime { get; set; }
         public DateTime OutTime { get; set; }
+        public TimeSpan Duration => OutTime.Subtract(InTime);
     }
 }

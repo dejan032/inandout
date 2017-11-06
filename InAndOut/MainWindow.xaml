@@ -4,6 +4,7 @@
                      xmlns:mahApps="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                      xmlns:iconPacks="using:MahApps.Metro.IconPacks"
                      xmlns:iconPacks1="http://metro.mahapps.com/winfx/xaml/iconpacks"
+                     xmlns:converters="clr-namespace:InAndOut.Converters"
                      Title="InAndOut"
                      SizeToContent="WidthAndHeight"
                      ResizeMode="NoResize"
@@ -17,19 +18,33 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Skins/MainSkin.xaml" />
                 <ResourceDictionary Source="Resources/Icons.xaml" />
+                <ResourceDictionary>
+                    <converters:NullVisibilityConverter x:Key="NullToVisibilityConverter"/>
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
 
     <mahApps:MetroWindow.Flyouts>
         <mahApps:FlyoutsControl>
-            <mahApps:Flyout x:Name="sideBar" Content="{Binding Menu}" AnimateOpacity="True"
-                            AutoCloseInterval="15000" IsAutoCloseEnabled="True" CloseButtonVisibility="Collapsed" />
+            <mahApps:Flyout x:Name="sideBar" AnimateOpacity="True"
+                            AutoCloseInterval="15000" IsAutoCloseEnabled="True" CloseButtonVisibility="Collapsed" >
+                <mahApps:Flyout.Content>
+                    <ItemsControl ItemsSource="{Binding MenuItems}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Content="{Binding Name}" Command="{Binding CallBackAction}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </mahApps:Flyout.Content>
+                
+            </mahApps:Flyout>
         </mahApps:FlyoutsControl>
     </mahApps:MetroWindow.Flyouts>
     
     <mahApps:MetroWindow.LeftWindowCommands>
-        <mahApps:WindowCommands>
+        <mahApps:WindowCommands Visibility="{Binding OldMenuItems, Converter={StaticResource NullToVisibilityConverter}}" >
             <ToggleButton Width="30" Height="30"
                           IsChecked="{Binding ElementName=sideBar, Path=IsOpen}"
                           Content="{iconPacks1:PackIconMaterial  Menu}"/>

@@ -28,6 +28,7 @@ namespace InAndOut.ViewModel
 
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<PunchClockViewModel>();
+            SimpleIoc.Default.Register<DetailDataViewModel>();
         }
 
         /// <summary>
@@ -39,7 +40,8 @@ namespace InAndOut.ViewModel
         public MainViewModel Main => ServiceLocator.Current.GetInstance<MainViewModel>();
 
         public PunchClockViewModel PunchClock => ServiceLocator.Current.GetInstance<PunchClockViewModel>();
-
+        public DetailDataViewModel DetailData => ServiceLocator.Current.GetInstance<DetailDataViewModel>();
+        
         /// <summary>
         /// Cleans up all the resources.
         /// </summary>

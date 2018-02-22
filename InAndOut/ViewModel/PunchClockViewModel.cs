@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Threading;
 using GalaSoft.MvvmLight.Messaging;
 using MenuItem = InAndOut.Model.MenuItem;
+using InAndOut.ViewModel.MVVMMSGS;
 
 namespace InAndOut.ViewModel
 {
@@ -21,6 +22,7 @@ namespace InAndOut.ViewModel
     public class PunchClockViewModel : ViewModelBase
     {
         private readonly PunchClock _punchClock;
+        private static readonly string ClassName = nameof(PunchClockViewModel);
 
         /// <inheritdoc />
         /// <summary>
@@ -31,6 +33,12 @@ namespace InAndOut.ViewModel
             _punchClock = PunchClock.Instance;
             InitMenuItems();
             Messenger.Default.Send(new PropertyChangedMessage<List<Model.MenuItem>>(default(List<MenuItem>), _menuItems, MainViewModel.MenuItemsPropertyName));
+            Messenger.Default.Register<UpdateMenuItems>(this, msg => {
+                if (ClassName.Equals(msg.ClassName))
+                {
+                    Messenger.Default.Send(new PropertyChangedMessage<List<Model.MenuItem>>(default(List<MenuItem>), _menuItems, MainViewModel.MenuItemsPropertyName));
+                }
+            });
         }
 
         private void InitMenuItems()
@@ -42,7 +50,8 @@ namespace InAndOut.ViewModel
                     Name = "Details",
                     CallBackAction = new RelayCommand(() =>
                     {
-                        Messenger.Default.Send(new PropertyChangedMessage<string>(default(string), "details",MainViewModel.ContentPropertyName));
+                        Messenger.Default.Send(new PropertyChangedMessage<string>(default(string), ViewNames.DetailsDaily,MainViewModel.ContentPropertyName));
+                        Messenger.Default.Send(new UpdateMenuItems(nameof(DetailsDailyViewModel)));
                     })
                 }
             };

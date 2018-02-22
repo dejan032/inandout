@@ -80,15 +80,28 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\NullVisibilityConverter.cs" />
+    <Compile Include="Converters\TimeSpanToBoolConverter.cs" />
+    <Compile Include="Helpers\TimeSpanEx.cs" />
     <Compile Include="Model\MenuItem.cs" />
     <Compile Include="Model\PunchClock.cs" />
     <Compile Include="Model\TimeEntry.cs" />
-    <Compile Include="ViewModel\DetailDataViewModel.cs" />
+    <Compile Include="Model\TimeEntryType.cs" />
+    <Compile Include="ViewModel\DetailsDailyViewModel.cs" />
+    <Compile Include="ViewModel\DetailsMonthlyViewModel.cs" />
+    <Compile Include="ViewModel\DetailsWeeklyViewModel.cs" />
     <Compile Include="ViewModel\PunchClockViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="MVVMMSGS\UpdateMenuItems.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
-    <Compile Include="View\DetailDataView.xaml.cs">
-      <DependentUpon>DetailDataView.xaml</DependentUpon>
+    <Compile Include="ViewModel\ViewNames.cs" />
+    <Compile Include="View\DetailsDailyView.xaml.cs">
+      <DependentUpon>DetailsDailyView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\DetailsMonthlyView.xaml.cs">
+      <DependentUpon>DetailsMonthlyView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\DetailsWeeklyView.xaml.cs">
+      <DependentUpon>DetailsWeeklyView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\LoginView.xaml.cs">
       <DependentUpon>LoginView.xaml</DependentUpon>
@@ -120,7 +133,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\DetailDataView.xaml">
+    <Page Include="View\DetailsDailyView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\DetailsMonthlyView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\DetailsWeeklyView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -28,7 +28,9 @@ namespace InAndOut.ViewModel
 
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<PunchClockViewModel>();
-            SimpleIoc.Default.Register<DetailDataViewModel>();
+            SimpleIoc.Default.Register<DetailsDailyViewModel>();
+            SimpleIoc.Default.Register<DetailsWeeklyViewModel>();
+            SimpleIoc.Default.Register<DetailsMonthlyViewModel>();
         }
 
         /// <summary>
@@ -40,8 +42,10 @@ namespace InAndOut.ViewModel
         public MainViewModel Main => ServiceLocator.Current.GetInstance<MainViewModel>();
 
         public PunchClockViewModel PunchClock => ServiceLocator.Current.GetInstance<PunchClockViewModel>();
-        public DetailDataViewModel DetailData => ServiceLocator.Current.GetInstance<DetailDataViewModel>();
-        
+        public DetailsDailyViewModel DailyDetailsData => ServiceLocator.Current.GetInstance<DetailsDailyViewModel>();
+        public DetailsWeeklyViewModel WeeklyDetailsData => ServiceLocator.Current.GetInstance<DetailsWeeklyViewModel>();
+        public DetailsMonthlyViewModel MothlyDetailsData => ServiceLocator.Current.GetInstance<DetailsMonthlyViewModel>();
+
         /// <summary>
         /// Cleans up all the resources.
         /// </summary>

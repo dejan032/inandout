@@ -18,9 +18,9 @@ namespace InAndOut.View
     /// <summary>
     /// Interaction logic for DetailDataView.xaml
     /// </summary>
-    public partial class DetailDataView : UserControl
+    public partial class DetailsDailyView : UserControl
     {
-        public DetailDataView()
+        public DetailsDailyView()
         {
             InitializeComponent();
         }

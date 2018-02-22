@@ -33,8 +33,8 @@ namespace InAndOut.ViewModel
         private void MenuItemsChanged(PropertyChangedMessage<List<Model.MenuItem>> propertyDetails)
         {
             if (!propertyDetails.PropertyName.Equals(MenuItemsPropertyName)) return;
-            OldMenuItems = propertyDetails.NewValue;
-            RaisePropertyChanged(nameof(OldMenuItems));
+            MenuItems = propertyDetails.NewValue;
+            RaisePropertyChanged(nameof(MenuItems));
         }
 
         private void ContentChanged(PropertyChangedMessage<string> propertyDetails)
@@ -47,21 +47,29 @@ namespace InAndOut.ViewModel
 
         public UserControl Content { get; set; }
 
-        public List<Model.MenuItem> OldMenuItems { get; set; }
+        public List<Model.MenuItem> MenuItems { get; set; }
         
 
-        private void ChangeView(string name = "clock")
+        private void ChangeView(string name = ViewNames.PunchClock)
         {
-            if (name.Equals("clock"))
+            if (name.Equals(ViewNames.PunchClock))
             {
                 Content = new PunchClockView();
-                RaisePropertyChanged(nameof(Content));
             }
-            else if (name.Equals("details"))
+            else if (name.Equals(ViewNames.DetailsDaily))
             {
-                Content = new DetailDataView();
-                RaisePropertyChanged(nameof(Content));
+                Content = new DetailsDailyView();
             }
+            else if (name.Equals(ViewNames.DetailsWeekly))
+            {
+                Content = new DetailsWeeklyView();
+            }
+            else if (name.Equals(ViewNames.DetailsMonthly))
+            {
+                Content = new DetailsMonthlyView();
+            }
+
+            RaisePropertyChanged(nameof(Content));
         }
     }
 }

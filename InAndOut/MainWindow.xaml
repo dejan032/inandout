@@ -33,7 +33,7 @@
                     <ItemsControl ItemsSource="{Binding MenuItems}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Button Content="{Binding Name}" Command="{Binding CallBackAction}"/>
+                                <Button Content="{Binding Name}" Command="{Binding CallBackAction}" Width="Auto"/>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
@@ -44,7 +44,7 @@
     </mahApps:MetroWindow.Flyouts>
     
     <mahApps:MetroWindow.LeftWindowCommands>
-        <mahApps:WindowCommands Visibility="{Binding OldMenuItems, Converter={StaticResource NullToVisibilityConverter}}" >
+        <mahApps:WindowCommands Visibility="{Binding MenuItems, Converter={StaticResource NullToVisibilityConverter}}" >
             <ToggleButton Width="30" Height="30"
                           IsChecked="{Binding ElementName=sideBar, Path=IsOpen}"
                           Content="{iconPacks1:PackIconMaterial  Menu}"/>

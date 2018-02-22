@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Windows.Media;
 using LiteDB;
 
 namespace InAndOut.Model
@@ -55,16 +53,16 @@ namespace InAndOut.Model
             _workEndTime = new DateTime();
         }
 
-
         private void AddWorkTimeEntry()
         {
             // Open database (or create if doesn't exist)
             using (var db = new LiteDatabase(@"MyData.db"))
             {
                 // Get collection instance
-                var col = db.GetCollection<TimeEntry>("work-entries");
+                var col = db.GetCollection<TimeEntry>("time-entries");
                 // Insert document to collection - if collection do not exits, create now
-                col.Insert(new TimeEntry() { InTime = _workStartTime,OutTime = _workEndTime,TimeStamp = DateTime.Now});
+                var entry = new TimeEntry(0,_workStartTime, _workEndTime, DateTime.Now, TimeEntryType.Work);
+                col.Insert(entry);
             }
         }
 
@@ -74,9 +72,10 @@ namespace InAndOut.Model
             using (var db = new LiteDatabase(@"MyData.db"))
             {
                 // Get collection instance
-                var col = db.GetCollection<TimeEntry>("break-entries");
+                var col = db.GetCollection<TimeEntry>("time-entries");
                 // Insert document to collection - if collection do not exits, create now
-                col.Insert(new TimeEntry() { InTime = _breakStartTime, OutTime = _breakEndTime, TimeStamp = DateTime.Now });
+                var entry = new TimeEntry(0,_breakStartTime, _breakEndTime, DateTime.Now, TimeEntryType.Break);
+                col.Insert(entry);
             }
         }
 
@@ -126,7 +125,34 @@ namespace InAndOut.Model
                     break;
             }
         }
+
+        public void TestFillDataSet(int numberOfEntries)
+        {
+            for (var i = 0; i < numberOfEntries; i++)
+            {
+                var randomDay = DateTime.UtcNow
+                    .Subtract(TimeSpan.FromDays(new Random().Next(2 * 365)))
+                    .Date
+                    .AddHours(new Random().Next(6, 9))
+                    .AddMinutes(new Random().Next(0, 45))
+                    .AddSeconds(new Random().Next(0, 45));
+                var randomStartTime = randomDay.AddSeconds(new Random().Next(0, 5));
+                var randomBreakStartTime = randomStartTime.AddHours(new Random().Next(2, 4));
+                var randomBreakEndTime = randomBreakStartTime.AddMinutes(new Random().Next(0, 45));
+                var randomEndTime = randomBreakEndTime.AddHours(new Random().Next(4, 6));
+
+                // Open database (or create if doesn't exist)
+                using (var db = new LiteDatabase(@"MyData.db"))
+                {
+                    // Get collection instance
+                    var col = db.GetCollection<TimeEntry>("time-entries");
+                    var breakentry = new TimeEntry(0, randomBreakStartTime, randomBreakEndTime, randomDay, TimeEntryType.Break);
+                    col.Insert(breakentry);
+                    // Insert punchin time
+                    var workentry = new TimeEntry(0, randomStartTime, randomEndTime, randomDay, TimeEntryType.Work);
+                    col.Insert(workentry);
+                }
+            }
+        }
     }
-
-
 }
